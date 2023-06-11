@@ -1,22 +1,26 @@
-import { Detail } from "@raycast/api";
-import { LaravelTip } from "./laravel-tip";
+import { ActionPanel, Detail, Icon } from "@raycast/api";
+import { ReactElement } from "react";
+import { random } from "./laravel-tip";
+import { usePromise } from "@raycast/utils";
 
-export default function Random() {
-  const laravel = new LaravelTip();
-  const { data, isLoading, error } = laravel.random();
+export default function Random(): ReactElement {
+  const { data: results, isLoading, revalidate } = usePromise(random, []);
 
-  if (error) {
-    let msg = "";
-    if (error.message.includes("Query returned no rows")) {
-      msg = "Could not find any tips, please run `laraveltips sync` command in your terminal to sync all tips first.";
-    }
-
-    return <Detail isLoading={false} markdown={`## Error \n ${msg} \n > ${error.message}`} />;
-  }
-
-  if (!data) {
-    return <Detail isLoading={true} markdown={`## Loading \n Loading random tip...`} />;
-  }
-
-  return <Detail isLoading={isLoading} markdown={`## ${data.title} \n ${data.content}`} navigationTitle={data.title} />;
+  return (
+    <Detail
+      markdown={results?.data ? `## ${results.data.title}\n\n${results.data.content}` : ""}
+      isLoading={isLoading}
+      navigationTitle={results?.data?.title || "Random Tip"}
+      actions={
+        <ActionPanel>
+          <ActionPanel.Item
+            title="Next Tip"
+            icon={Icon.Gift}
+            shortcut={{ modifiers: ["cmd"], key: "n" }}
+            onAction={() => revalidate()}
+          />
+        </ActionPanel>
+      }
+    />
+  );
 }
