@@ -160,10 +160,8 @@ function formatStoragePath(storagePath: string): string {
 async function formatBinaryPath(binaryPath: string): Promise<ExecutionResult<string>> {
   // no binary path provided? use built-in binary
   if (!binaryPath || binaryPath.trim() == "") {
-    binaryPath = `${environment.assetsPath}/laraveltips`;
+    binaryPath = `${environment.assetsPath}/laraveltips-${await uname()}`;
   }
-
-  console.log("binaryPath", binaryPath);
 
   await detect(binaryPath);
 
@@ -181,4 +179,13 @@ async function detect(binary: string): Promise<void> {
   } catch {
     await fs.promises.chmod(binary, 0o775);
   }
+}
+
+/**
+ * Get cpu architecture name
+ */
+async function uname(): Promise<string> {
+  const { stdout } = await spawnSync("uname", ["-m"]);
+
+  return stdout.toString().trim().toLowerCase();
 }
