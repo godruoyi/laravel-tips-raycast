@@ -5,6 +5,7 @@ import { useBinaryPath } from "./hooks/useBinaryPath";
 import { homedir } from "os";
 import { environment } from "@raycast/api";
 import { spawnSync } from "child_process";
+import { useGithubToken } from "./hooks/useGithubToken";
 
 export interface LaravelTip {
   id: number;
@@ -97,12 +98,17 @@ export async function execute(command: string, args: string[]): Promise<Executio
   return { data: data ? JSON.parse(data) : [] };
 }
 
+/**
+ * Spawn a process with the given binary path, command and arguments
+ *
+ * @param binaryPath
+ * @param command
+ * @param args
+ */
 async function spawn(binaryPath: string, command: string, args: string[]): Promise<ExecutionResult<string>> {
   const options = ["-o", "json", "-q", "--path", formatStoragePath(useStoragePath()), command, ...args];
   const { status, stdout, stderr } = spawnSync(binaryPath, options, {
-    env: {
-      ...process.env,
-    }
+    env: prepareEnvironment(),
   });
 
   if (status !== 0) {
@@ -112,6 +118,28 @@ async function spawn(binaryPath: string, command: string, args: string[]): Promi
   return { data: stdout.toString() };
 }
 
+/**
+ * Prepare environment variables for the laraveltips binary
+ *
+ * Why we need this? Sometimes we can't fetch any data from GitHub API, because of the rate limit.
+ * API rate limit exceeded for your IP address (But here's the good news: Authenticated requests get a higher rate limit.
+ * Check out the documentation for more details).
+ *
+ * @see https://docs.github.com/rest/overview/resources-in-the-rest-api#rate-limiting
+ */
+function prepareEnvironment(): NodeJS.ProcessEnv | undefined {
+  const token = useGithubToken();
+  if (token) {
+    return { LARAVEL_TIPS_ACCESS_TOKEN: token };
+  }
+
+  return undefined;
+}
+
+/**
+ * Detect if the database file exists, if not, we need to sync the data from the remote server
+ * when user run the command for the first time.
+ */
 async function detectDatabaseFileHasExists(): Promise<boolean> {
   const storagePath = formatStoragePath(useStoragePath());
 
