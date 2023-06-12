@@ -99,7 +99,11 @@ export async function execute(command: string, args: string[]): Promise<Executio
 
 async function spawn(binaryPath: string, command: string, args: string[]): Promise<ExecutionResult<string>> {
   const options = ["-o", "json", "-q", "--path", formatStoragePath(useStoragePath()), command, ...args];
-  const { status, stdout, stderr } = spawnSync(binaryPath, options);
+  const { status, stdout, stderr } = spawnSync(binaryPath, options, {
+    env: {
+      ...process.env,
+    }
+  });
 
   if (status !== 0) {
     return { error: new ExecutionError(stderr.toString()) };
