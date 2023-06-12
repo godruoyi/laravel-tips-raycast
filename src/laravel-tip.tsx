@@ -106,7 +106,15 @@ export async function execute(command: string, args: string[]): Promise<Executio
  * @param args
  */
 async function spawn(binaryPath: string, command: string, args: string[]): Promise<ExecutionResult<string>> {
-  const options = ["-o", "json", "-q", "--path", formatStoragePath(useStoragePath()), command, ...args];
+  const storagePath = useStoragePath();
+  const options = ["-o", "json", "-q"];
+
+  if (storagePath) {
+    options.push("--path", formatStoragePath(storagePath));
+  }
+
+  options.push(command, ...args);
+
   const { status, stdout, stderr } = spawnSync(binaryPath, options, {
     env: prepareEnvironment(),
   });
