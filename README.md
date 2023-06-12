@@ -5,6 +5,8 @@
 - ✅ Lucky tips randomly
 - ✅ Search tips by keyword
 - 👀 Use SQLite FT5 support full-text search
+- 👀 Remove built-in `laraveltips` and download it from [godruoyi/laravel-tips](https://github.com/godruoyi/laravel-tips)
+  automatically
 
 ![List](metadata/0.png)
 
@@ -32,7 +34,7 @@ You will need to have [Node.js](https://nodejs.org) and [pnpm](https://pnpm.io/)
 
 1. Clone this repo `git clone https://github.com/godruoyi/laravel-tips-raycast.git`
 2. Go to the folder `cd laravel-tips-raycast`
-3. Install dependencies `pnpm install`
+3. Install dependencies `npm install && npm run dev`
 4. Go to Raycast, run `Import Extension` and select the folder
 
 ## License
