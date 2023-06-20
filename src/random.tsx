@@ -1,4 +1,4 @@
-import { ActionPanel, Detail, Icon, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Detail, Icon, showToast, Toast } from "@raycast/api";
 import { ReactElement } from "react";
 import { random } from "./laravel-tip";
 import { usePromise } from "@raycast/utils";
@@ -18,10 +18,9 @@ export default function Random(): ReactElement {
     <Detail
       markdown={results?.data ? `## ${results.data.title}\n\n${results.data.content}` : ""}
       isLoading={isLoading}
-      navigationTitle={results?.data?.title || "Random Tip"}
       actions={
         <ActionPanel>
-          <ActionPanel.Item
+          <Action
             title="Next Tip"
             icon={Icon.Gift}
             shortcut={{ modifiers: ["cmd"], key: "n" }}
